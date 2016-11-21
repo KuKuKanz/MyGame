@@ -1,0 +1,23 @@
+<Solution>
+  <PropertyGroup Name="MyGame" Version="3.10.0.0" Type="CocosStudio" />
+  <SolutionFolder>
+    <Group ctype="ResourceGroup">
+      <RootFolder Name=".">
+        <Folder Name="Test">
+          <PlistImageFolder Image="pelatuk_default.png" PListFile="pelatuk_default.plist" Name=".pelatuk_default_PList.Dir">
+            <PlistImageFile Name="pelatuk1.png" Key="pelatuk1.png" />
+            <PlistImageFile Name="pelatuk2.png" Key="pelatuk2.png" />
+            <PlistImageFile Name="pelatuk3.png" Key="pelatuk3.png" />
+            <PlistImageFile Name="pelatuk4.png" Key="pelatuk4.png" />
+            <PlistImageFile Name="pelatuk5.png" Key="pelatuk5.png" />
+            <PlistImageFile Name="pelatuk6.png" Key="pelatuk6.png" />
+          </PlistImageFolder>
+          <Image Name="pelatuk_default.png" />
+        </Folder>
+        <Project Name="DownloaderScene.csd" Type="Scene" />
+        <Image Name="HelloWorld.png" />
+        <Project Name="MainScene.csd" Type="Scene" />
+      </RootFolder>
+    </Group>
+  </SolutionFolder>
+</Solution>
