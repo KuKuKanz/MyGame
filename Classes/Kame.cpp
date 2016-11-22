@@ -10,6 +10,10 @@
 
 static const char* KAME_COVER = "Kame/effect_kameCoverEnergy.plist";
 static const char* KAME_CAST = "Kame/effect_kame2.plist";
+static const char* KAME_HEAD = "Kame/effect_kameHead.plist";
+static const char* KAME_OP_HEAD = "Kame/effect_kameOpHead.plist";
+
+
 static const char* KAME_SOUND = "Kame/kame.mp3";
 
 
@@ -20,10 +24,14 @@ bool Kamehameha::init(){
     }
     
     CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(KAME_SOUND,false);
-    
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(KAME_SOUND,false);
+
+    CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(KAME_SOUND,false);
+
     _coverEnergy = ParticleSystemQuad::create(KAME_COVER);
     _coverEnergy->setPosition(0,0);
     _coverEnergy->setScale(0.5);
+    
     
     this->addChild(_coverEnergy);
     
@@ -57,8 +65,26 @@ void Kamehameha::update(float dt){
 
 
 void Kamehameha::callBackFinalCast(float dt){
-   
+    _head = ParticleSystemQuad::create(KAME_HEAD);
+    _head->setPosition(0,0);
+    _head->setScale(0.7);
+    _head->resetSystem();
+    this->addChild(_head);
     
+    auto _callBackHeadStop = CallFuncN::create(CC_CALLBACK_0(Kamehameha::callBackHeadStop, this));
+    
+    _head->runAction(Sequence::create(MoveBy::create(0.7, Vec2(1000,0)),_callBackHeadStop,NULL));
+    
+    
+    {
+        _OpHead = ParticleSystemQuad::create(KAME_OP_HEAD);
+        _OpHead->setPosition(0,0);
+        _OpHead->setScale(0.7);
+        _OpHead->resetSystem();
+        this->addChild(_OpHead);
+
+        _OpHead->runAction(MoveBy::create(3, Vec2(-100,0)));
+    }
     _finalCast = ParticleSystemQuad::create(KAME_CAST);
     _finalCast->setEmissionRate(1000);
     _finalCast->setPosition(0,0);
@@ -73,12 +99,20 @@ void Kamehameha::callBackFinalCast(float dt){
 
 void Kamehameha::callBackStop(float dt){
     _finalCast->stopSystem();
+    _OpHead->stopSystem();
+    
+    this->runAction(Sequence::create(DelayTime::create(2),RemoveSelf::create(), NULL));
+
+    
+}
+
+void Kamehameha::callBackHeadStop(){
+    _head->stopSystem();
+
     for(auto _par : vecPar){
         _par->stopSystem();
     }
     
-    this->runAction(Sequence::create(DelayTime::create(2),RemoveSelf::create(), NULL));
     this->unscheduleUpdate();
 
-    
 }

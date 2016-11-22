@@ -201,6 +201,7 @@ void TaiXiuBoard::drawBoard(){
     _loadingBar->setContentSize(Size(234,234));
     _loadingBar->setNormalizedPosition(Vec2(0.50,0.53));
     _loadingBar->setPercentage(50);
+    _loadingBar->setVisible(false);
     _loadingBar->setTag(kTagTimeline);
     _sprXiNgauCenterBox->addChild(_loadingBar);
     

@@ -9,7 +9,7 @@
 #include "TaiXiuDialog.hpp"
 #include "ResourceNew.h"
 
-#define MAX_TIME 15
+#define MAX_TIME 5
 
 static TaiXiuDialog* TAI_XIU = NULL;
 
@@ -32,7 +32,7 @@ bool TaiXiuDialog::init(){
         return false;
     }
     setisPause(false);
-    _boardState = TXBoardState::COUNT_DOWN;
+    _boardState = TXBoardState::NEXT_TIME;
     
     _containerXiNgau = NULL;
     _containerXiNgauCursor = NULL;
@@ -47,6 +47,9 @@ bool TaiXiuDialog::init(){
     _curBetCash = 0;
     _curTaiBetCash = 0;
     _curXiuBetCash = 0;
+    _time = 9999;
+    _nextTime = -1;
+
 
     
     _root = TaiXiuBoard::create();
@@ -77,7 +80,7 @@ bool TaiXiuDialog::init(){
     buttonSetting();
     setEnabledButton(TaiXiuButton::btnAll,false);
 
-    startTimer(0);
+    startNextTime(15);
 
     return true;
 }
@@ -103,23 +106,24 @@ void TaiXiuDialog::onExit(){
 }
 
 void TaiXiuDialog::resetTimer(){
-    resetTimeLine();
+    if (_nextTime > 0 && _boardState == TXBoardState::NEXT_TIME){
+        resetTimeLine();
+    }
 }
 
 void TaiXiuDialog::resetTimeLine(){
-    float per = _time/MAX_TIME*100;
+    float per = (float)_nextTime/(float)this->_defaultNextTime*100;
     
     ptTimeLine->setPercentage(per);
     
-    sprTimeEffect->setRotation(getExactRotation(per));
+    sprTimeEffect->setRotation(getExactRotation(100-per));
     
     auto _callXiNgau = CallFuncN::create(CC_CALLBACK_0(TaiXiuDialog::callBackTimeLine, this));
-    auto _sed = Sequence::create(ProgressFromTo::create(_time,per, 100),
+    auto _sed = Sequence::create(ProgressFromTo::create(_nextTime,100-per, 100),
                                  _callXiNgau, NULL);
     
     ptTimeLine->runAction(_sed);
-    sprTimeEffect->runAction( RotateBy::create(_time, 405-(sprTimeEffect->getRotation())));
-
+    sprTimeEffect->runAction( RotateBy::create(_nextTime, 405-(sprTimeEffect->getRotation())));
 }
 
 void TaiXiuDialog::testAddHistory(float dt){
@@ -290,26 +294,48 @@ void TaiXiuDialog::reSettingVar(){
 }
 
 void TaiXiuDialog::startTimer(float dt){
+    _boardState = TXBoardState::COUNT_DOWN;
     _time = MAX_TIME;
-
-    ptTimeLine->setVisible(true);
+    //ptTimeLine->setVisible(true);
     this->showTxtResult(false);
     testCallXiNgau(0);
     showTxtClock(true);
     //setEnabledButton(TaiXiuButton::btnAll, true);
     resetStatus();
-    txtClock->setColor(Color3B::WHITE);
+    
+    //ptTimeLine->setPercentage(0);
+    
+    //sprTimeEffect->setRotation(getExactRotation(0));
+    
+    //auto _callXiNgau = CallFuncN::create(CC_CALLBACK_0(TaiXiuDialog::callBackTimeLine, this));
+//    auto _sed = Sequence::create(ProgressFromTo::create(MAX_TIME,0, 100),
+//                                _callXiNgau, NULL);
+    
+    //ptTimeLine->runAction(_sed);
+    //sprTimeEffect->runAction( RotateBy::create(MAX_TIME, 405-(sprTimeEffect->getRotation())));
+}
+
+void TaiXiuDialog::startNextTime(float dt){
+    _boardState = TXBoardState::NEXT_TIME;
+    _nextTime = dt;
+    _defaultNextTime = dt;
+    
+    ptTimeLine->setVisible(true);
+    this->showTxtResult(false);
+    testCallXiNgau(0);
+    showTxtClockNextTime(true);
+    resetStatus();
     
     ptTimeLine->setPercentage(0);
     
     sprTimeEffect->setRotation(getExactRotation(0));
     
     auto _callXiNgau = CallFuncN::create(CC_CALLBACK_0(TaiXiuDialog::callBackTimeLine, this));
-    auto _sed = Sequence::create(ProgressFromTo::create(MAX_TIME,0, 100),
-                                _callXiNgau, NULL);
+    auto _sed = Sequence::create(ProgressFromTo::create(_nextTime,0, 100),
+                                 _callXiNgau, NULL);
     
     ptTimeLine->runAction(_sed);
-    sprTimeEffect->runAction( RotateBy::create(MAX_TIME, 405-(sprTimeEffect->getRotation())));
+    sprTimeEffect->runAction( RotateBy::create(_nextTime, 405-(sprTimeEffect->getRotation())));
 }
 
 float TaiXiuDialog::getExactRotation(float _per){
@@ -576,8 +602,11 @@ void TaiXiuDialog::showCashResult(bool _enable){
     int _resultCash = 0;
     
     if (!_enable){
-        txtAddMoney->setVisible(false);
-        txtSubMoney->setVisible(false);
+        auto _cloneAnimationText = (Label*)sprTimeTable->getChildByTag(989);
+        if (_cloneAnimationText != NULL){
+            _cloneAnimationText->stopAllActions();
+            _cloneAnimationText->removeFromParent();
+        }
         return;
     }
     
@@ -601,9 +630,6 @@ void TaiXiuDialog::showCashResult(bool _enable){
     
     if (_resultCash > 0){
         txtAddMoney->setString(StringUtils::format("+%zd",_resultCash));
-        txtAddMoney->setVisible(true);
-        txtAddMoney->setLocalZOrder(_containerXiNgau->getLocalZOrder()+1);
-        
         this->castAnimationForLabel(txtAddMoney);
         
         //Them hieu ung particle tiền nếu thắng.
@@ -612,22 +638,25 @@ void TaiXiuDialog::showCashResult(bool _enable){
         sprTimeTable->addChild(_effect_win_coin, 9999, 9999);
     }else if (_resultCash < 0){
         txtSubMoney->setString(StringUtils::format("-%zd",-_resultCash));
-        txtSubMoney->setVisible(true);
-        txtSubMoney->setLocalZOrder(_containerXiNgau->getLocalZOrder()+1);
         this->castAnimationForLabel(txtSubMoney);
     }
 }
 
 void TaiXiuDialog::castAnimationForLabel(cocos2d::Label *_lable){
-    _lable->setScale(0.2);
-    _lable->setNormalizedPosition(Vec2(0.50,0.7458));
-
+    
+    auto _clone = Label::createWithBMFont(_lable->getBMFontFilePath(),_lable->getString());
+    _clone->setAnchorPoint(Vec2(0.5,0.5));
+    _clone->setAlignment(TextHAlignment::CENTER,TextVAlignment::CENTER);
+    _clone->setNormalizedPosition(Vec2(0.50,0.7458));
+    sprTimeTable->addChild(_clone,9999,989);
+    
+    _clone->setScale(0.2);
+    
     auto _scale = ScaleTo::create(0.5, 1);
     auto _move = MoveBy::create(3, Vec2(0, 50));
     
     auto _spawn = Spawn::create(EaseElasticOut::create(_scale, 0.5),_move, NULL);
-    
-    _lable->runAction(_spawn);
+    _clone->runAction(_spawn);
 }
 
 void TaiXiuDialog::callBackInvisible(){
@@ -781,6 +810,7 @@ void TaiXiuDialog::showTxtClock(bool _enable){
             txtClock->setString(StringUtils::format("00:%zd",_time));
             txtCursorTime->setString(StringUtils::format("00:%zd",_time));
             txtCursorTime->setColor(Color3B::GREEN);
+            txtClock->setColor(Color3B::WHITE);
         }else if (_time >=0 && _time<10){
             txtClock->setColor(Color3B::RED);
             txtCursorTime->setColor(Color3B(255,150,55) );
@@ -799,10 +829,38 @@ void TaiXiuDialog::showTxtClock(bool _enable){
     }
 }
 
+void TaiXiuDialog::showTxtClockNextTime(bool _enable){
+    if (_enable){
+        txtClock->setVisible(true);
+        
+        if (_nextTime>= 10){
+            txtClock->setString(StringUtils::format("00:%zd",_nextTime));
+            txtCursorTime->setString(StringUtils::format("00:%zd",_nextTime));
+            txtCursorTime->setColor(Color3B::GREEN);
+        }else if (_nextTime >=0 && _nextTime<10){
+            txtClock->setColor(Color3B::RED);
+            txtCursorTime->setColor(Color3B(255,150,55) );
+            txtClock->setString(StringUtils::format("00:0%zd",_nextTime));
+            txtCursorTime->setString(StringUtils::format("00:0%zd",_nextTime));
+        }else{
+            txtClock->setString("00:00");
+        }
+    }else{
+        txtClock->setVisible(false);
+        //txtCursorTime->setString("Kết Quả");
+        txtCursorTime->setString("");
+    }
+}
+
 
 void TaiXiuDialog::clock(float dt){
     //if (!txtClock->isVisible()) return;
+    
     _time--;
+    
+    if (_boardState == TXBoardState::NEXT_TIME){
+        _nextTime--;
+    }
     
     if (_time == 0){
         curTaiXiuStatus = TaiXiuStatus::select_NONE;
@@ -841,7 +899,19 @@ void TaiXiuDialog::clock(float dt){
         
         AnimatedCursor::getInstance()->showBoardResult(false);
         AnimatedCursor::getInstance()->setSleepingTime(1);
+        
+        startNextTime(15);
+        //startTimer(0);
+    }
+    
+    
+    if (_nextTime>=0){
+        showTxtClockNextTime(true);
+    }
+    
+    if (_nextTime == -1){
         startTimer(0);
+        _nextTime--;
     }
 }
 

@@ -45,7 +45,8 @@ enum TaiXiuButton{
 enum TXBoardState{
     COUNT_DOWN = 1,
     XINGAU_ACTION = 2,
-    RESULT = 3
+    RESULT = 3,
+    NEXT_TIME = 4
 };
 
 
@@ -63,6 +64,7 @@ public:
     static TaiXiuDialog* getInstance();
     
     void startTimer(float dt);
+    void startNextTime(float dt);
     
     void openTXDialog();
     void closeTXDialog();
@@ -131,6 +133,8 @@ private:
     void resetStatus();
     void showTxtResult(bool _enable);
     void showTxtClock(bool _enable);
+    void showTxtClockNextTime(bool _enable);
+
     void ShowBtnTaiXiuEffect(TaiXiuStatus _status, bool _enable);
     void createResultOnCursor(TaiXiuResultType _status);
     void castAnimationForLabel(Label* _lable);
@@ -148,6 +152,9 @@ private:
     
     
     int _time;
+    int _nextTime;
+    int _defaultNextTime;
+    
     
     void testAddHistory(float dt);
     void testCallXiNgau(float dt);

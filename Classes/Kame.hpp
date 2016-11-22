@@ -26,12 +26,16 @@ public:
 private:
     ParticleSystemQuad* _coverEnergy;
     ParticleSystemQuad* _finalCast;
-    
+    ParticleSystemQuad* _head;
+    ParticleSystemQuad* _OpHead;
+
     Vector<ParticleSystemQuad*> vecPar;
     
     void update(float dt);
     void callBackFinalCast(float dt);
     void callBackStop(float dt);
+    
+    void callBackHeadStop();
 
 };
 
