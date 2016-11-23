@@ -134,7 +134,8 @@ private:
     void showTxtResult(bool _enable);
     void showTxtClock(bool _enable);
     void showTxtClockNextTime(bool _enable);
-
+    std::string getTimeClock(int _timeClock);
+    
     void ShowBtnTaiXiuEffect(TaiXiuStatus _status, bool _enable);
     void createResultOnCursor(TaiXiuResultType _status);
     void castAnimationForLabel(Label* _lable);
@@ -167,6 +168,8 @@ private:
     int getCountCoinToShow(int _cash);
     
     Node* CreatePhomBigWinEffect(int _cash);
+    
+    void showTxt(std::string _s);
 
 
 };

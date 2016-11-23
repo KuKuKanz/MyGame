@@ -31,6 +31,8 @@ private:
 
     Vector<ParticleSystemQuad*> vecPar;
     
+    float _scale;
+    
     void update(float dt);
     void callBackFinalCast(float dt);
     void callBackStop(float dt);

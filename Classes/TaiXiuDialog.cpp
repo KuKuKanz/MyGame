@@ -9,7 +9,7 @@
 #include "TaiXiuDialog.hpp"
 #include "ResourceNew.h"
 
-#define MAX_TIME 5
+#define MAX_TIME 300
 
 static TaiXiuDialog* TAI_XIU = NULL;
 
@@ -807,15 +807,15 @@ void TaiXiuDialog::showTxtClock(bool _enable){
         txtClock->setVisible(true);
         
         if (_time>= 10){
-            txtClock->setString(StringUtils::format("00:%zd",_time));
-            txtCursorTime->setString(StringUtils::format("00:%zd",_time));
+            txtClock->setString(getTimeClock(_time));
+            txtCursorTime->setString(getTimeClock(_time));
             txtCursorTime->setColor(Color3B::GREEN);
             txtClock->setColor(Color3B::WHITE);
         }else if (_time >=0 && _time<10){
             txtClock->setColor(Color3B::RED);
             txtCursorTime->setColor(Color3B(255,150,55) );
-            txtClock->setString(StringUtils::format("00:0%zd",_time));
-            txtCursorTime->setString(StringUtils::format("00:0%zd",_time));
+            txtClock->setString(getTimeClock(_time));
+            txtCursorTime->setString(getTimeClock(_time));
             if (_time == 0){
                 
             }
@@ -850,6 +850,36 @@ void TaiXiuDialog::showTxtClockNextTime(bool _enable){
         //txtCursorTime->setString("Kết Quả");
         txtCursorTime->setString("");
     }
+}
+
+std::string TaiXiuDialog::getTimeClock(int _timeClock){
+    
+    std::string tempMin = "";
+    std::string tempSec = "";
+    
+    int min = 0;
+    int sec = _timeClock;
+    
+    while (sec > 59) {
+        min++;
+        sec-= 60;
+    }
+    
+    if (min > 0){
+        tempMin = StringUtils::format("%zd",min);
+        tempSec = StringUtils::format("%zd",sec);
+        
+        if (tempMin.length() == 1){
+            tempMin = "0" + tempMin;
+        }
+        
+        if (tempSec.length() == 1){
+            tempSec = "0" + tempSec;
+        }
+    }
+    
+    showTxt(tempMin + ":" + tempSec);
+    return tempMin + ":" + tempSec;
 }
 
 
@@ -913,6 +943,16 @@ void TaiXiuDialog::clock(float dt){
         startTimer(0);
         _nextTime--;
     }
+}
+
+void TaiXiuDialog::showTxt(std::string _s){
+    auto _lbl = Label::createWithTTF(_s, srcTFF_Roboto_Bold, 20);
+    
+    _lbl->setNormalizedPosition(Vec2(0.5,0.2));
+    
+    this->addChild(_lbl,99999);
+    
+    _lbl->runAction(Sequence::create(MoveBy::create(3, Vec2(0,100)),RemoveSelf::create(), NULL));
 }
 
 static float _speedReduction = 0.1; ///Giảm 5% tiền per frame
