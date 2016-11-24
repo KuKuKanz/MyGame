@@ -167,6 +167,10 @@ private:
     void onExit();
     int getCountCoinToShow(int _cash);
     
+    bool _isAttractSuccessfully;
+    
+    void enableAttractUserForSelecting(bool _enable);
+    
     Node* CreatePhomBigWinEffect(int _cash);
     
     void showTxt(std::string _s);

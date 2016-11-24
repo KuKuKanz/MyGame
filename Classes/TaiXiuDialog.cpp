@@ -9,11 +9,12 @@
 #include "TaiXiuDialog.hpp"
 #include "ResourceNew.h"
 
-#define MAX_TIME 300
+#define MAX_TIME 10
 
 static TaiXiuDialog* TAI_XIU = NULL;
 
 static const char* srcPNG_tx_result_bo3 = "TaiXiu/tx_results_bo3.png";
+
 
 
 TaiXiuDialog* TaiXiuDialog::getInstance(){
@@ -22,7 +23,7 @@ TaiXiuDialog* TaiXiuDialog::getInstance(){
         TAI_XIU->retain();
         TAI_XIU->setTag(1);
     }
-    
+    srcTFF_Roboto_Bold
     return TAI_XIU;
 }
 
@@ -49,6 +50,7 @@ bool TaiXiuDialog::init(){
     _curXiuBetCash = 0;
     _time = 9999;
     _nextTime = -1;
+    _isAttractSuccessfully = false;
 
 
     
@@ -169,6 +171,8 @@ void TaiXiuDialog::openTXDialog(){
     
     _close = false;
     sprTenGame->runAction(_root->_aniTenGame);
+    this->enableAttractUserForSelecting(true);
+
 }
 
 void TaiXiuDialog::closeTXDialog(){
@@ -865,7 +869,7 @@ std::string TaiXiuDialog::getTimeClock(int _timeClock){
         sec-= 60;
     }
     
-    if (min > 0){
+    if (min >= 0){
         tempMin = StringUtils::format("%zd",min);
         tempSec = StringUtils::format("%zd",sec);
         
@@ -878,7 +882,7 @@ std::string TaiXiuDialog::getTimeClock(int _timeClock){
         }
     }
     
-    showTxt(tempMin + ":" + tempSec);
+
     return tempMin + ":" + tempSec;
 }
 
@@ -891,6 +895,10 @@ void TaiXiuDialog::clock(float dt){
     if (_boardState == TXBoardState::NEXT_TIME){
         _nextTime--;
     }
+    if (_time == 1){
+        AnimatedCursor::getInstance()->showBoardResult(true);
+        AnimatedCursor::getInstance()->setSleepingTime(1000);
+    }
     
     if (_time == 0){
         curTaiXiuStatus = TaiXiuStatus::select_NONE;
@@ -898,11 +906,7 @@ void TaiXiuDialog::clock(float dt){
         this->ShowBtnTaiXiuEffect(TaiXiuStatus::select_XIU, false);
         
         setEnabledButton(TaiXiuButton::btnAll,false);
-    }
-    
-    if (_time == 1){
-        AnimatedCursor::getInstance()->showBoardResult(true);
-        AnimatedCursor::getInstance()->setSleepingTime(1000);
+        this->enableAttractUserForSelecting(false);
     }
     
     if (_time < 0 && _time >= -1){
@@ -912,7 +916,6 @@ void TaiXiuDialog::clock(float dt){
     }else if (_time >= 0){
         showTxtClock(true);
     }
-    
     if (_time == -6){
         _boardState = TXBoardState::RESULT;
         this->showTxtResult(true);
@@ -926,6 +929,7 @@ void TaiXiuDialog::clock(float dt){
         showCashResult(false);
         this->ShowBtnTaiXiuEffect(TaiXiuStatus::select_TAI, false);
         this->ShowBtnTaiXiuEffect(TaiXiuStatus::select_XIU, false);
+        this->enableAttractUserForSelecting(true);
         
         AnimatedCursor::getInstance()->showBoardResult(false);
         AnimatedCursor::getInstance()->setSleepingTime(1);
@@ -1034,6 +1038,8 @@ void TaiXiuDialog::createEffectOnClickTX(TaiXiuStatus _status){
 }
 
 void TaiXiuDialog::ShowBtnTaiXiuEffect(TaiXiuStatus _status, bool _enable){
+    enableAttractUserForSelecting(false);
+    
     switch (_status) {
         case select_TAI:{
             if (_enable){
@@ -1089,6 +1095,40 @@ Node* TaiXiuDialog::CreatePhomBigWinEffect(int cash){
     _node->addChild(lightEffect,0);
     
     return _node;
+}
+
+void TaiXiuDialog::enableAttractUserForSelecting(bool _enable){
+    
+    if (_enable){
+        if (curTaiXiuStatus == TaiXiuStatus::select_NONE && !_isAttractSuccessfully){
+            _isAttractSuccessfully = true;
+            
+            sprTai->setScale(1);
+            sprXiu->setScale(1);
+            
+            auto _scaleDown = ScaleTo::create(1.5, 0.9);
+            auto _scaleDefault = ScaleTo::create(1.5, 1);
+            auto _scaleUp = ScaleTo::create(1.5, 1.1);
+            
+            auto _sed1 = Sequence::create(_scaleDown->clone(),_scaleDefault->clone(),_scaleUp->clone(),_scaleDefault->clone(), NULL);
+            auto _sed2 = Sequence::create(_scaleUp->clone(),_scaleDefault->clone(),_scaleDown->clone(),_scaleDefault->clone(), NULL);
+            
+            auto _repeat1 = RepeatForever::create(_sed1);
+            auto _repeat2 = RepeatForever::create(_sed2);
+            
+            
+            sprTai->runAction(_repeat1);
+            sprXiu->runAction(_repeat2);
+        }
+    }else{
+        if (_isAttractSuccessfully){
+            sprXiu->stopAllActions();
+            sprTai->stopAllActions();
+            sprTai->setScale(1);
+            sprXiu->setScale(1);
+        }
+    }
+    
 }
 
 
