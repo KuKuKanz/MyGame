@@ -106,6 +106,7 @@ private:
     EventListenerTouchOneByOne* _listener;
     
     ParticleSystemQuad* parTimeEffect;
+    ParticleSystemQuad* _effectFocusLastResult;
     
     XiNgauController* _containerXiNgau;
     XiNgauController* _containerXiNgauCursor;
@@ -150,6 +151,9 @@ private:
     void callBackDialogAppear();
     void callBackXiNgau(float _timeShowResult);
     void callBackTimeLine();
+    void callBackCoinWaveTai();
+    void callBackCoinWaveXiu();
+
     
     
     int _time;
@@ -175,6 +179,7 @@ private:
     
     void showTxt(std::string _s);
 
+    void setFocus();
 
 };
 

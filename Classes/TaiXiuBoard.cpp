@@ -394,7 +394,7 @@ void TaiXiuBoard::drawBoard(){
     _listViewHistory->setBounceEnabled(false);
     _listViewHistory->setScrollBarEnabled(false);
     _listViewHistory->setItemsMargin(10);
-    _listViewHistory->setContentSize(Size(370,32));
+    _listViewHistory->setContentSize(Size(370,50));
     _listViewHistory->setNormalizedPosition(Vec2(0.5,0.9250));
     _listViewHistory->setTag(KTagListView);
 

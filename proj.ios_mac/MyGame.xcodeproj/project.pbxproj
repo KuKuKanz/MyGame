@@ -110,6 +110,8 @@
 		898B40161D98FC6D002481B9 /* NCTBaseDialog.hpp in Sources */ = {isa = PBXBuildFile; fileRef = 89B290721D94D2C30041530B /* NCTBaseDialog.hpp */; };
 		89935B2F1DC97DC1001565DE /* TaiXiuBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89935B2D1DC97DC1001565DE /* TaiXiuBoard.cpp */; };
 		89935B301DC97DC1001565DE /* TaiXiuBoard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89935B2D1DC97DC1001565DE /* TaiXiuBoard.cpp */; };
+		89A4F3611DE6E43000DE40EF /* coinwave.wav in Resources */ = {isa = PBXBuildFile; fileRef = 89A4F3601DE6E43000DE40EF /* coinwave.wav */; };
+		89A4F3621DE6E43000DE40EF /* coinwave.wav in Resources */ = {isa = PBXBuildFile; fileRef = 89A4F3601DE6E43000DE40EF /* coinwave.wav */; };
 		89B0F9991DAB37AE008F4666 /* project.manifest in Resources */ = {isa = PBXBuildFile; fileRef = 89B0F9981DAB37AE008F4666 /* project.manifest */; };
 		89B0F99A1DAB3C1E008F4666 /* project.manifest in Resources */ = {isa = PBXBuildFile; fileRef = 89B0F9981DAB37AE008F4666 /* project.manifest */; };
 		89B500001DA4F2FB004AC568 /* DemoAnimatedCoin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89B5FFFE1DA4F2FB004AC568 /* DemoAnimatedCoin.cpp */; };
@@ -343,6 +345,7 @@
 		897925781DD16C11004D1D28 /* Clock.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Clock.hpp; sourceTree = "<group>"; };
 		89935B2D1DC97DC1001565DE /* TaiXiuBoard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TaiXiuBoard.cpp; sourceTree = "<group>"; };
 		89935B2E1DC97DC1001565DE /* TaiXiuBoard.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = TaiXiuBoard.hpp; sourceTree = "<group>"; };
+		89A4F3601DE6E43000DE40EF /* coinwave.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = coinwave.wav; sourceTree = "<group>"; };
 		89B0F9981DAB37AE008F4666 /* project.manifest */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = project.manifest; sourceTree = "<group>"; };
 		89B290711D94D2C30041530B /* NCTBaseDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NCTBaseDialog.cpp; sourceTree = "<group>"; };
 		89B290721D94D2C30041530B /* NCTBaseDialog.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = NCTBaseDialog.hpp; sourceTree = "<group>"; };
@@ -547,6 +550,7 @@
 		46880B7519C43A67006E1F66 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				89A4F3601DE6E43000DE40EF /* coinwave.wav */,
 				89D853C61DE2D25900D8CDAA /* Kame */,
 				89765F931DC82B5200E15D89 /* TaiXiuResourceNew */,
 				890E70E11DC71E8B0098D41C /* TaiXiu */,
@@ -889,6 +893,7 @@
 				89FA89D91D93E9A9000EBA0D /* NewMailBox in Resources */,
 				89B500051DA4F707004AC568 /* coin.png in Resources */,
 				8916BD761DB70E3400F94F53 /* particle_pTimeLineEffect.plist in Resources */,
+				89A4F3611DE6E43000DE40EF /* coinwave.wav in Resources */,
 				89FA89D11D93E9A9000EBA0D /* Image in Resources */,
 				5087E78117EB970100C73F5D /* Icon-120.png in Resources */,
 				5087E78617EB970100C73F5D /* Icon-76.png in Resources */,
@@ -985,6 +990,7 @@
 				89CDAF9A1DB6150A00B84680 /* particle_timeLine.plist in Resources */,
 				89E4535D1DAE1F0A001290E9 /* cocosui in Resources */,
 				89B0F99A1DAB3C1E008F4666 /* project.manifest in Resources */,
+				89A4F3621DE6E43000DE40EF /* coinwave.wav in Resources */,
 				8916BD871DB7629300F94F53 /* layoutEffect.plist in Resources */,
 				89FAEAEF1DA742F900EB4466 /* MenuIcon_press.png in Resources */,
 				89FAEAEC1DA7402500EB4466 /* frame_circle.png in Resources */,

@@ -9,7 +9,7 @@
 #include "TaiXiuDialog.hpp"
 #include "ResourceNew.h"
 
-#define MAX_TIME 10
+#define MAX_TIME 25
 
 static TaiXiuDialog* TAI_XIU = NULL;
 
@@ -23,7 +23,6 @@ TaiXiuDialog* TaiXiuDialog::getInstance(){
         TAI_XIU->retain();
         TAI_XIU->setTag(1);
     }
-    srcTFF_Roboto_Bold
     return TAI_XIU;
 }
 
@@ -51,6 +50,7 @@ bool TaiXiuDialog::init(){
     _time = 9999;
     _nextTime = -1;
     _isAttractSuccessfully = false;
+    _effectFocusLastResult = NULL;
 
 
     
@@ -82,7 +82,9 @@ bool TaiXiuDialog::init(){
     buttonSetting();
     setEnabledButton(TaiXiuButton::btnAll,false);
 
-    startNextTime(15);
+    startNextTime(5);
+    
+    addHistoryResult(TaiXiuResultType::TAI);
 
     return true;
 }
@@ -191,6 +193,8 @@ void TaiXiuDialog::closeTXDialog(){
     if (_effect_win_coin != NULL){
         sprTimeTable->removeChild(_effect_win_coin, true);
     }
+    
+    _effectFocusLastResult->stopSystem();
 }
 
 
@@ -382,7 +386,28 @@ void TaiXiuDialog::addHistoryResultToListView(ImageView* _img){
     }
     
     listViewResult->setNormalizedPosition(Vec2(0.5,listViewResult->getNormalizedPosition().y));
+}
+
+void TaiXiuDialog::setFocus(){
+    auto _lastResult = listViewResult->getItems().back();
     
+    if (_lastResult != NULL){
+        
+        if (_effectFocusLastResult == NULL){
+            _effectFocusLastResult = ParticleSystemQuad::create("TaiXiu/focusLastResult.plist");
+            _effectFocusLastResult->retain();
+        }
+        
+        if (_effectFocusLastResult->getParent() != NULL){
+            _effectFocusLastResult->removeFromParent();
+        }
+        _lastResult->addChild(_effectFocusLastResult);
+        _effectFocusLastResult->setPosition(_lastResult->getContentSize()/2);
+        _effectFocusLastResult->setPositionY(_effectFocusLastResult->getPositionY()+1.5);
+        _effectFocusLastResult->resetSystem();
+
+        
+    }
 }
 
 void TaiXiuDialog::addHistoryResult(TaiXiuResultType _type){
@@ -567,6 +592,7 @@ void TaiXiuDialog::confirmBet(){
             txtTaiBet->setString(StringUtils::format("%zd",_taiBetCashShow));
             auto wave = AnimatedCoinWave::createAnimatedCoinWave(getCountCoinToShow(_betCash),txtuserBet->getPosition(),sprTai->getPosition());
             wave->SetCoinType(CoinType::GOLD);
+            wave->addCoinCallBack(CC_CALLBACK_0(TaiXiuDialog::callBackCoinWaveTai, this));
             wave->setDuration(1);
             wave->setScale(0.5);
             wave->start();
@@ -583,6 +609,7 @@ void TaiXiuDialog::confirmBet(){
             
             auto wave = AnimatedCoinWave::createAnimatedCoinWave(getCountCoinToShow(_betCash),txtuserBet->getPosition(),sprXiu->getPosition());
             wave->SetCoinType(CoinType::GOLD);
+            wave->addCoinCallBack(CC_CALLBACK_0(TaiXiuDialog::callBackCoinWaveXiu, this));
             wave->setDuration(1);
             wave->setScale(0.5);
             wave->start();
@@ -597,6 +624,36 @@ void TaiXiuDialog::confirmBet(){
     _curBetCash = _betCash;
     _betCash = 0;
 }
+
+void TaiXiuDialog::callBackCoinWaveTai(){
+    switch (curTaiXiuStatus) {
+        case select_TAI:
+        {
+            sprTai->stopAllActions();
+            sprTai->setScale(MAX((float)sprTai->getScale()-0.03,(float)0.6));
+            sprTai->runAction(EaseElasticOut::create(ScaleTo::create(0.5, 1.1),1));
+        }
+            break;
+          default:
+            break;
+    }
+}
+
+void TaiXiuDialog::callBackCoinWaveXiu(){
+    switch (curTaiXiuStatus) {
+        case select_XIU:
+        {
+            sprXiu->stopAllActions();
+            sprXiu->setScale(MAX((float)sprXiu->getScale()-0.03,(float)0.6));
+            sprXiu->runAction(EaseElasticOut::create(ScaleTo::create(0.5, 1.1),1));
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
 
 int TaiXiuDialog::getCountCoinToShow(int _cash){
     return MAX(_cash/20000, 1);
@@ -678,6 +735,7 @@ void TaiXiuDialog::callBackInvisible(){
 
 void TaiXiuDialog::callBackDialogAppear(){
     parTimeEffect->resetSystem();
+    setFocus();
 }
 
 void TaiXiuDialog::callBackTimeLine(){
@@ -919,6 +977,7 @@ void TaiXiuDialog::clock(float dt){
     if (_time == -6){
         _boardState = TXBoardState::RESULT;
         this->showTxtResult(true);
+        setFocus();
     }
     
     if (_time == -8){
@@ -934,7 +993,7 @@ void TaiXiuDialog::clock(float dt){
         AnimatedCursor::getInstance()->showBoardResult(false);
         AnimatedCursor::getInstance()->setSleepingTime(1);
         
-        startNextTime(15);
+        startNextTime(5);
         //startTimer(0);
     }
     
@@ -1098,7 +1157,7 @@ Node* TaiXiuDialog::CreatePhomBigWinEffect(int cash){
 }
 
 void TaiXiuDialog::enableAttractUserForSelecting(bool _enable){
-    
+    return;
     if (_enable){
         if (curTaiXiuStatus == TaiXiuStatus::select_NONE && !_isAttractSuccessfully){
             _isAttractSuccessfully = true;

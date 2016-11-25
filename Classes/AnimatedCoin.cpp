@@ -23,7 +23,7 @@ static const int FRAME_START_INDEX  = 1;
 static const int FRAME_END_INDEX    = 8;
 
 // ** Path for playing sound when coins reach destination */
-static const char* SOUND_PATH        = "coinsinhand2.mp3";
+static const char* SOUND_PATH        = "coinwave.wav";
 
 // ** Path of Particle effect to border around the coins. */
 static const char* PARTICEL_PATH     = "win_effect.plist";
@@ -129,7 +129,8 @@ bool AnimatedCoin::initCoin(CoinType _type){
     this->FINAL_FLAG = false;
     this->type = _type;
     this->isStop = false;
-
+    this->target = NULL;
+    
     std::string coinPath = getCoinPath(_type);
     
     Vector<SpriteFrame*> vecFrame;
@@ -195,13 +196,9 @@ void AnimatedCoin::stop(){
         
         this->getParent()->addChild(lightEffect);
         
-        if (random(0, 100) < 75){
+        if (random(0, 100) > 50){
             CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(SOUND_PATH);
-
         }
-        
-        CocosDenshion::SimpleAudioEngine::getInstance()->playEffect(SOUND_PATH);
-
         
         this->stopAllActions();
         this->unscheduleAllCallbacks();
@@ -218,11 +215,15 @@ void AnimatedCoin::stop(){
         this->parent = NULL;
         this->removeFromParent();
         isStop = true;
+        
     }
     
     
 }
 
+void AnimatedCoin::setTarget(cocos2d::Sprite *_target){
+    this->target = _target;
+}
 
 
 void AnimatedCoin::SetAnimatedAction(cocos2d::Vec2 _start,
@@ -248,7 +249,7 @@ void AnimatedCoin::SetAnimatedAction(cocos2d::Vec2 _start,
     
     //give to sequence with callback.
     Sequence* finalAct;
-    finalAct = Sequence::create(act,CallFuncN::create(CC_CALLBACK_0(AnimatedCoin::stop, this)), NULL);
+    finalAct = Sequence::create(act,callback,CallFuncN::create(CC_CALLBACK_0(AnimatedCoin::stop, this)), NULL);
     this->setScale(0.05);
     
     auto spawn = Spawn::create(RotateBy::create(5, 120),ScaleTo::create(1, this->scale),finalAct, NULL);

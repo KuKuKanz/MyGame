@@ -26,6 +26,8 @@ enum CoinType{
 class AnimatedCoin : public Sprite{
     
 private:
+    Sprite* target;
+    
     bool FINAL_FLAG;
     
     RepeatForever* coinAnimate;
@@ -59,6 +61,7 @@ private:
     void SetAnimatedAction  (Vec2 _start,Vec2 _end,CallFuncN* callback,CallFuncN* callback2);
     
     
+    
 public:
     bool isStop;
 
@@ -84,6 +87,7 @@ public:
                                 float _scale,
                                 float duration);
 
+    void setTarget(Sprite* _target);
 
     void stop();
 };
@@ -118,6 +122,8 @@ public:
     void setScale           (float _scale) override;
     
     void setDuration        (float _duration);
+    
+    void setTarget(Sprite* _target);
     
     void start();
     
