@@ -9,7 +9,7 @@
 #include "TaiXiuDialog.hpp"
 #include "ResourceNew.h"
 
-#define MAX_TIME 25
+#define MAX_TIME 30
 
 static TaiXiuDialog* TAI_XIU = NULL;
 
@@ -152,6 +152,9 @@ void TaiXiuDialog::createTouchListener(){
 }
 
 void TaiXiuDialog::openTXDialog(){
+    
+    enableAttractUserForSelecting(true);
+    
     this->setVisible(true);
     _backGround->setVisible(true);
 
@@ -178,6 +181,8 @@ void TaiXiuDialog::openTXDialog(){
 }
 
 void TaiXiuDialog::closeTXDialog(){
+    enableAttractUserForSelecting(false);
+
      _backGround->setVisible(false);
     auto _scale = ScaleTo::create(1, 0.0);
     auto _move = EaseElasticOut::create(MoveTo::create(1, AnimatedCursor::getInstance()->getPosition()),1);
@@ -231,11 +236,9 @@ void TaiXiuDialog::storeChild(cocos2d::Node *_node){
     ->getChildByTag<Text*>(38)
     ->getChildByTag<Text*>(kTagTextTaiBet);
     
-    txtXiuBettor = dialog->getChildByTag<Sprite*>(34)
-    ->getChildByTag<Button*>(kTagTextXiuBettor);
+    txtXiuBettor = dialog->getChildByTag<Text*>(kTagTextXiuBettor);
     
-    txtTaiBettor = dialog->getChildByTag<Sprite*>(52)
-    ->getChildByTag<Button*>(kTagTextTaiBettor);
+    txtTaiBettor = dialog->getChildByTag<Text*>(kTagTextTaiBettor);
     
     txtClock = sprTimeTable
     ->getChildByTag<Text*>(kTagTextClock);
@@ -310,7 +313,8 @@ void TaiXiuDialog::startTimer(float dt){
     showTxtClock(true);
     //setEnabledButton(TaiXiuButton::btnAll, true);
     resetStatus();
-    
+    enableAttractUserForSelecting(true);
+
     //ptTimeLine->setPercentage(0);
     
     //sprTimeEffect->setRotation(getExactRotation(0));
@@ -500,8 +504,8 @@ void TaiXiuDialog::resetStatus(){
     txtTaiBet->setString("0");
     txtuserBet->setTitleText("0");
     _curBetCash = _betCash;
-    _curTaiBetCash = _curTaiBetCash;
-    _curXiuBetCash = _curXiuBetCash;
+    _curTaiBetCash = _taiBetCash;
+    _curXiuBetCash = _xiuBetCash;
     _betCash = 0;
     _taiBetCash = 0;
     _xiuBetCash = 0;
@@ -527,24 +531,28 @@ void TaiXiuDialog::callBackTouchBtn(cocos2d::Ref *pSender, ui::Widget::TouchEven
                 case kTagBtn1:
                     setBet(1000);
                     log("BTN 1 OK");
+                    enableAttractUserForButtonBet(true);
                     break;
                     
                     
                 case kTagBtn2:
                     setBet(5000);
                     log("BTN 2 OK");
+                    enableAttractUserForButtonBet(true);
                     break;
                     
                     
                 case kTagBtn3:
                     setBet(10000);
                     log("BTN 3 OK");
+                    enableAttractUserForButtonBet(true);
                     break;
                     
                     
                 case kTagBtn4:
                     setBet(50000);
                     log("BTN 4 OK");
+                    enableAttractUserForButtonBet(true);
                     break;
                     
                 case kTagBtnBet:
@@ -944,11 +952,20 @@ std::string TaiXiuDialog::getTimeClock(int _timeClock){
     return tempMin + ":" + tempSec;
 }
 
+static int user = 0;
 
 void TaiXiuDialog::clock(float dt){
     //if (!txtClock->isVisible()) return;
     
     _time--;
+    
+
+//    txtXiuBettor->setString(StringUtils::format("%zd",user));
+//    txtXiuBettor->setTextAreaSize(txtXiuBettor->getContentSize());
+//    auto _spr = (Sprite*)txtXiuBettor->getChildByTag(34);
+//    _spr->setPosition(-5, txtXiuBettor->getContentSize().height/2);
+//
+//    user+= 500;
     
     if (_boardState == TXBoardState::NEXT_TIME){
         _nextTime--;
@@ -1004,6 +1021,8 @@ void TaiXiuDialog::clock(float dt){
     
     if (_nextTime == -1){
         startTimer(0);
+        enableAttractUserForButton(false);
+        enableAttractUserForButtonBet(false);
         _nextTime--;
     }
 }
@@ -1064,10 +1083,12 @@ void TaiXiuDialog::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event){
         if (curTaiXiuStatus == TaiXiuStatus::select_TAI) return;
         curTaiXiuStatus = TaiXiuStatus::select_TAI;
         createEffectOnClickTX(curTaiXiuStatus);
+        enableAttractUserForButton(true);
     }else if (utils::getCascadeBoundingBox(sprXiu).containsPoint(touch->getLocation())){
         if (curTaiXiuStatus == TaiXiuStatus::select_XIU) return;
         curTaiXiuStatus = TaiXiuStatus::select_XIU;
         createEffectOnClickTX(curTaiXiuStatus);
+        enableAttractUserForButton(true);
     }
     
 }
@@ -1157,23 +1178,27 @@ Node* TaiXiuDialog::CreatePhomBigWinEffect(int cash){
 }
 
 void TaiXiuDialog::enableAttractUserForSelecting(bool _enable){
-    return;
     if (_enable){
-        if (curTaiXiuStatus == TaiXiuStatus::select_NONE && !_isAttractSuccessfully){
+        if (curTaiXiuStatus == TaiXiuStatus::select_NONE && !_isAttractSuccessfully && _time > 0 ){
             _isAttractSuccessfully = true;
             
             sprTai->setScale(1);
             sprXiu->setScale(1);
             
-            auto _scaleDown = ScaleTo::create(1.5, 0.9);
-            auto _scaleDefault = ScaleTo::create(1.5, 1);
-            auto _scaleUp = ScaleTo::create(1.5, 1.1);
             
-            auto _sed1 = Sequence::create(_scaleDown->clone(),_scaleDefault->clone(),_scaleUp->clone(),_scaleDefault->clone(), NULL);
-            auto _sed2 = Sequence::create(_scaleUp->clone(),_scaleDefault->clone(),_scaleDown->clone(),_scaleDefault->clone(), NULL);
+            auto _scaleUp = ScaleTo::create(1, 1.1);
+            auto _easeUp = EaseElasticIn::create(_scaleUp, 0.5);
             
-            auto _repeat1 = RepeatForever::create(_sed1);
-            auto _repeat2 = RepeatForever::create(_sed2);
+            auto _scaleDown = ScaleTo::create(1, 0.9);
+            auto _easeDown = EaseElasticIn::create(_scaleDown, 0.5);
+            
+            
+            auto seq1 = Sequence::create(_easeUp->clone(),DelayTime::create(1.5),_easeDown->clone(),DelayTime::create(1.5), NULL);
+            
+            auto seq2 = Sequence::create(_easeDown->clone() ,DelayTime::create(1.5),_easeUp->clone(),DelayTime::create(1.5), NULL);
+            
+            auto _repeat1 = RepeatForever::create(seq1);
+            auto _repeat2 = RepeatForever::create(seq2);
             
             
             sprTai->runAction(_repeat1);
@@ -1185,10 +1210,54 @@ void TaiXiuDialog::enableAttractUserForSelecting(bool _enable){
             sprTai->stopAllActions();
             sprTai->setScale(1);
             sprXiu->setScale(1);
+            _isAttractSuccessfully = false;
         }
     }
     
 }
+
+void TaiXiuDialog::enableAttractUserForButton(bool _enable){
+    if (_enable){
+        if (!_isFirstClickTX){
+            auto _scaleUp = ScaleTo::create(0.25, 1.1);
+            auto _scaleDown = EaseElasticOut::create(ScaleTo::create(0.5, 1), 0.5);
+            
+            btn1->runAction(Sequence::create(_scaleUp->clone(),_scaleDown->clone(), NULL));
+            btn2->runAction(Sequence::create(_scaleUp->clone(),_scaleDown->clone(), NULL));
+            btn3->runAction(Sequence::create(_scaleUp->clone(),_scaleDown->clone(), NULL));
+            btn4->runAction(Sequence::create(_scaleUp->clone(),_scaleDown->clone(), NULL));
+            
+            _isFirstClickTX = true;
+        }
+    }else if (_isFirstClickTX){
+        btn1->setScale(1);
+        btn2->setScale(1);
+        btn3->setScale(1);
+        btn4->setScale(1);
+        
+        _isFirstClickTX = false;
+    }
+}
+
+void TaiXiuDialog::enableAttractUserForButtonBet(bool _enable){
+    if (_enable){
+        if (!_isFirstCLickBtnBet){
+            auto _scaleUp = ScaleTo::create(0.5, 1.1);
+            auto _scaleDown = EaseElasticOut::create(ScaleTo::create(0.5, 1), 0.5);
+            
+            btnBet->runAction(Sequence::create(_scaleUp->clone(),_scaleDown->clone(), NULL));
+            btnRemove->runAction(Sequence::create(_scaleUp->clone(),_scaleDown->clone(), NULL));
+            
+            _isFirstCLickBtnBet = true;
+        }
+    }else if (_isFirstCLickBtnBet){
+        btnBet->setScale(1);
+        btnRemove->setScale(1);
+        _isFirstCLickBtnBet = false;
+    }
+    
+}
+
 
 
 

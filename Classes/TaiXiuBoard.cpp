@@ -92,21 +92,25 @@ void TaiXiuBoard::drawBoard(){
     _X->setNormalizedPosition(Vec2(0.5,0.5));
     _btnClose->addChild(_X);
 
-    auto _sprUserPlayingXiu = Sprite::createWithSpriteFrame(sprCache->getSpriteFrameByName(srcPNG_tx_playinguser));
-    _sprUserPlayingXiu->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
-    _sprUserPlayingXiu->setNormalizedPosition(Vec2(0.08,0.7761));
-    _sprUserPlayingXiu->setTag(34);
-    _dialog->addChild(_sprUserPlayingXiu);
     
-    auto _txtUserPlayingXiu = Text::create("100.000", srcTFF_Roboto_Bold, 20);
-    _txtUserPlayingXiu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
-    _txtUserPlayingXiu->setTextHorizontalAlignment(TextHAlignment::LEFT);
+    
+    auto _txtUserPlayingXiu = Text::create("1", srcTFF_Roboto_Bold, 20);
+    _txtUserPlayingXiu->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    _txtUserPlayingXiu->setTextHorizontalAlignment(TextHAlignment::CENTER);
     _txtUserPlayingXiu->setTextVerticalAlignment(TextVAlignment::CENTER);
-    _txtUserPlayingXiu->setContentSize(Size(120,23));
     _txtUserPlayingXiu->setOpacity(0.8*255);
-    _txtUserPlayingXiu->setNormalizedPosition(Vec2(1.2941,0.5));
+    _txtUserPlayingXiu->setNormalizedPosition(Vec2(0.2,0.8));
     _txtUserPlayingXiu->setTag(kTagTextXiuBettor);
-    _sprUserPlayingXiu->addChild(_txtUserPlayingXiu);
+    _dialog->addChild(_txtUserPlayingXiu);
+    
+    auto _sprUserPlayingXiu = Sprite::createWithSpriteFrame(sprCache->getSpriteFrameByName(srcPNG_tx_playinguser));
+    _sprUserPlayingXiu->setAnchorPoint(Vec2::ANCHOR_MIDDLE_RIGHT);
+    float size = _txtUserPlayingXiu->getContentSize().width/2;
+    _sprUserPlayingXiu->setPosition(-5, _txtUserPlayingXiu->getContentSize().height/2);
+    
+    float _x =_sprUserPlayingXiu->getPositionX();
+    _sprUserPlayingXiu->setTag(34);
+    _txtUserPlayingXiu->addChild(_sprUserPlayingXiu);
     
     auto _sprUserPlayingTai = Sprite::createWithSpriteFrame(sprCache->getSpriteFrameByName(srcPNG_tx_playinguser));
     _sprUserPlayingTai->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
@@ -396,6 +400,7 @@ void TaiXiuBoard::drawBoard(){
     _listViewHistory->setItemsMargin(10);
     _listViewHistory->setContentSize(Size(370,50));
     _listViewHistory->setNormalizedPosition(Vec2(0.5,0.9250));
+    _listViewHistory->setClippingEnabled(false);
     _listViewHistory->setTag(KTagListView);
 
     _dialog->addChild(_listViewHistory);

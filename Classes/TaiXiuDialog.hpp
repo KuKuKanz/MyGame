@@ -94,9 +94,9 @@ private:
     
     Button *btnClose, *btnBet, *btnRemove, *btnHistory, *btn1, *btn2, *btn3, *btn4,*btnRule;
     
-    Button* txtuserBet, *txtXiuBettor, *txtTaiBettor;
-    
-    Text* txtClock, *txtTXResult, *txtSpecialResult, *txtXiuBet,*txtTaiBet, *txtCursorTime;
+    Button* txtuserBet;
+
+    Text* txtClock, *txtTXResult, *txtSpecialResult, *txtXiuBet,*txtTaiBet, *txtCursorTime, *txtXiuBettor, *txtTaiBettor;
     
     Label *txtAddMoney,*txtSubMoney;
     LoadingBar* ldbTimeLine;
@@ -172,8 +172,12 @@ private:
     int getCountCoinToShow(int _cash);
     
     bool _isAttractSuccessfully;
-    
+    bool _isFirstClickTX;
+    bool _isFirstCLickBtnBet;
+
     void enableAttractUserForSelecting(bool _enable);
+    void enableAttractUserForButton(bool _enable);
+    void enableAttractUserForButtonBet(bool _enable);
     
     Node* CreatePhomBigWinEffect(int _cash);
     
